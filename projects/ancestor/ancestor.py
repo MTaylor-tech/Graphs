@@ -27,21 +27,27 @@ def build_rev_adj_list(graph):
 
 def bft(graph, starting_vertex):
     q = Queue()
-    q.enqueue(starting_vertex)
+    q.enqueue([starting_vertex,0])
     visited = []
     level = 0
     last = [starting_vertex,level]
     printstr = ""
     while q.size() > 0:
-        cv = q.dequeue()
+        info = q.dequeue()
+        cv = info[0]
+        cl = info[1]
+        if cl > last[1] or cv < last[0]:
+            last = [cv,cl]
         visited.append(cv)
         if graph.get(cv) is not None:
             for n in graph.get(cv):
                 if n not in visited:
-                    q.enqueue(n)
-    if visited[-1]==starting_vertex:
+                    q.enqueue([n,cl+1])
+    if last[0]==starting_vertex:
         return -1
-    return visited[-1]
+    else:
+        return last[0]
 
+    
 test_ancestors = [(1, 3), (2, 3), (3, 6), (5, 6), (5, 7), (4, 5), (4, 8), (8, 9), (11, 8), (10, 1)]
 print(earliest_ancestor(test_ancestors,6))
