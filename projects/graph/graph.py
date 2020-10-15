@@ -40,12 +40,13 @@ class Graph:
         printstr = ""
         while q.size() > 0:
             cv = q.dequeue()
-            printstr += f"{cv}, "
+            # printstr += f"{cv}, "
+            print(cv)
             visited.append(cv)
             for n in self.get_neighbors(cv):
                 if n not in visited:
                     q.enqueue(n)
-        print(printstr[:-2])
+        # print(printstr[:-2])
 
     def dft(self, starting_vertex):
         """
@@ -58,12 +59,13 @@ class Graph:
         printstr = ""
         while s.size() > 0:
             cv = s.pop()
-            printstr += f"{cv}, "
+            print(cv)
+            # printstr += f"{cv}, "
             visited.append(cv)
             for n in self.get_neighbors(cv):
                 if n not in visited and n not in s.stack:
                     s.push(n)
-        print(printstr[:-2])
+        # print(printstr[:-2])
 
     def dft_recursive(self, starting_vertex, v=[]):
         """
@@ -74,11 +76,13 @@ class Graph:
         """
         starter = (len(v)==0)
         v.append(starting_vertex)
+        print(starting_vertex)
         for n in self.get_neighbors(starting_vertex):
             if n not in v:
                 v = self.dft_recursive(n,v)
         if starter:
-            print(v)
+            # print(v)
+            pass
         else:
             return v
 
