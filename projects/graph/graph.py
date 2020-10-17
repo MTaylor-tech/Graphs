@@ -1,7 +1,7 @@
 """
 Simple graph implementation
 """
-from util import Stack, Queue  # These may come in handy
+from util import Stack, Queue, QueueLL  # These may come in handy
 
 class Graph:
 
@@ -34,19 +34,16 @@ class Graph:
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        q = Queue()
+        q = QueueLL()
         q.enqueue(starting_vertex)
         visited = []
-        printstr = ""
-        while q.size() > 0:
+        while q.size > 0:
             cv = q.dequeue()
-            # printstr += f"{cv}, "
             print(cv)
             visited.append(cv)
             for n in self.get_neighbors(cv):
                 if n not in visited:
                     q.enqueue(n)
-        # print(printstr[:-2])
 
     def dft(self, starting_vertex):
         """
@@ -56,16 +53,13 @@ class Graph:
         s = Stack()
         s.push(starting_vertex)
         visited = []
-        printstr = ""
         while s.size() > 0:
             cv = s.pop()
             print(cv)
-            # printstr += f"{cv}, "
             visited.append(cv)
             for n in self.get_neighbors(cv):
                 if n not in visited and n not in s.stack:
                     s.push(n)
-        # print(printstr[:-2])
 
     def dft_recursive(self, starting_vertex, v=[]):
         """
@@ -80,10 +74,7 @@ class Graph:
         for n in self.get_neighbors(starting_vertex):
             if n not in v:
                 v = self.dft_recursive(n,v)
-        if starter:
-            # print(v)
-            pass
-        else:
+        if not starter:
             return v
 
     def bfs(self, starting_vertex, destination_vertex):
@@ -92,18 +83,17 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        q = Queue()
+        q = QueueLL()
         q.enqueue(starting_vertex)
         visited = []
         shortest = []
         paths = [[starting_vertex]]
-        while q.size() > 0:
+        while q.size > 0:
             cpath = []
             cv = q.dequeue()
             for p in paths:
                 if cv in p:
                     cpath = p
-            # print(f"CP: {cpath}, P: {paths}, V: {visited}")
             visited.append(cv)
             for n in self.get_neighbors(cv):
                 if n not in visited:
@@ -131,7 +121,6 @@ class Graph:
             for p in paths:
                 if cv in p:
                     cpath = p
-            # printstr += f"{cv}, "
             visited.append(cv)
             for n in self.get_neighbors(cv):
                 if n not in visited and n not in s.stack:
@@ -155,10 +144,6 @@ class Graph:
         starter = (len(v)==0)
         if starter:
             p = [starting_vertex]
-        # cp = []
-        # for ps in p:
-        #     if starting_vertex in ps:
-        #         cp = p
         v.append(starting_vertex)
         for n in self.get_neighbors(starting_vertex):
             if n not in v and n not in p:
@@ -231,10 +216,10 @@ if __name__ == '__main__':
     '''
     print(graph.bfs(1, 6))
 
-    # '''
-    # Valid DFS paths:
-    #     [1, 2, 4, 6]
-    #     [1, 2, 4, 7, 6]
-    # '''
+    '''
+    Valid DFS paths:
+        [1, 2, 4, 6]
+        [1, 2, 4, 7, 6]
+    '''
     print(graph.dfs(1, 6))
     print(graph.dfs_recursive(1, 6))
