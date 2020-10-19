@@ -33,27 +33,45 @@ traversal_path = []
 
 def bfs(g, starting_room):
     q = QueueLL()
-    q.enqueue(starting_room)
+    q.enqueue([starting_room])
+    # e = g[starting_room]
+    # print(e)
+    # x = {}
+    # for ex in e.keys():
+    #     # print(ex)
+    #     x.update({e.get(ex):ex})
+    # print(x)
     visited = []
+    v = {}
     shortest = []
-    paths = [[starting_room]]
+    # paths = [[starting_room]]
     while q.size > 0:
-        cpath = []
-        cv = q.dequeue()
-        for p in paths:
-            if cv in p:
-                cpath = p
+        cpath = q.dequeue()
+        cv = cpath[-1]
+        # cpath = []
+        # cv = q.dequeue()
+        # for p in paths:
+        #     if cv in p:
+        #         cpath = p
         visited.append(cv)
+        # print(visited)
         for d in g.get(cv).keys():
             if g.get(cv)[d] == '?':
-                return cpath
-                # shortest = cpath
-                #+ [g.get(cv)[d]]
-                break
-            if g.get(cv)[d] not in visited:
-                paths.append(cpath + [g.get(cv)[d]])
-                q.enqueue(g.get(cv)[d])
-    return shortest
+                # if len(visited) > 1 and cv in x:
+                #     return [x.get(cv),d]
+                # return cpath[1:]
+                # # shortest = cpath
+                # #+ [g.get(cv)[d]]
+                # break
+                if len(shortest)==0:
+                    shortest = cpath
+                elif len(cpath) < len(shortest):
+                    shortest = cpath
+            elif g.get(cv)[d] not in visited:
+                # paths.append(cpath + [g.get(cv)[d]])
+                # q.enqueue(g.get(cv)[d])
+                q.enqueue(cpath+[g.get(cv)[d]])
+    return shortest[1:]
 
 def first_question(room_dict):
     for direction in room_dict.keys():
@@ -61,66 +79,75 @@ def first_question(room_dict):
             return direction
     return None
 
-def retrace(g):
+def random_question(room_dict):
+    ways = []
+    for direction in room_dict.keys():
+        if room_dict.get(direction) == '?':
+            ways.append(direction)
+    if len(ways) > 0:
+        return random.choice(ways)
+    else:
+        return None
+
+def retrace(g,t):
     shortest = bfs(g,player.current_room.id)
-    print(shortest)
+    # print(shortest)
     for r in shortest:
         if r == '?':
             continue
         for d in g.get(player.current_room.id).keys():
             if g.get(player.current_room.id).get(d)==r:
                 player.travel(d)
-                traversal_path.append(d)
+                t.append(d)
 
-    # go = traversal_path[:]
-    # while len(go) > 0:
-    #     backwards = opposite[go.pop()]
-    #     player.travel(backwards)
-    #     traversal_path.append(backwards)
-    #     # print(player.current_room.id)
-    #     # print(g.get(player.current_room.id))
-    #     for d in g.get(player.current_room.id).keys():
-    #         if g[player.current_room.id][d] == '?':
-    #             return True
-
-g = {}
-v = set()
-v.add(player.current_room.id)
-while len(v) < len(room_graph):
-    if player.current_room.id not in g:
-        room_dict = {}
-        for e in player.current_room.get_exits():
-            room_dict.update({e:'?'})
-        g.update({player.current_room.id:room_dict})
-    room_dict = g.get(player.current_room.id)
-    direction = first_question(room_dict)
-    if direction is None:
-        retrace(g)
+def find_path():
+    g = {}
+    traversal = []
+    player.current_room = world.starting_room
+    v = set()
+    v.add(player.current_room.id)
+    while len(v) < len(room_graph):
+        if player.current_room.id not in g:
+            room_dict = {}
+            for e in player.current_room.get_exits():
+                room_dict.update({e:'?'})
+            g.update({player.current_room.id:room_dict})
         room_dict = g.get(player.current_room.id)
-        direction = first_question(room_dict)
-    if direction is None:
-        continue
-    next_room = player.current_room.get_room_in_direction(direction)
-    room_dict.update({direction:next_room.id})
-    if next_room.id not in g:
-        next_room_dict = {}
-        for e in next_room.get_exits():
-            if e == opposite[direction]:
-                next_room_dict.update({e:player.current_room.id})
-            else:
-                next_room_dict.update({e:'?'})
-        g.update({next_room.id:next_room_dict})
-    else:
-        g[next_room.id].update({opposite[direction]:player.current_room.id})
-        # g.update({player.current_room.id:room_dict})
-    if next_room.id not in v:
-        v.add(next_room.id)
-        traversal_path.append(direction)
-        player.travel(direction)
+        direction = random_question(room_dict)
+        if direction is None:
+            retrace(g,traversal)
+            room_dict = g.get(player.current_room.id)
+            direction = random_question(room_dict)
+        if direction is None:
+            continue
+        next_room = player.current_room.get_room_in_direction(direction)
+        room_dict.update({direction:next_room.id})
+        if next_room.id not in g:
+            next_room_dict = {}
+            for e in next_room.get_exits():
+                if e == opposite[direction]:
+                    next_room_dict.update({e:player.current_room.id})
+                else:
+                    next_room_dict.update({e:'?'})
+            g.update({next_room.id:next_room_dict})
+        else:
+            g[next_room.id].update({opposite[direction]:player.current_room.id})
+            # g.update({player.current_room.id:room_dict})
+        if next_room.id not in v:
+            v.add(next_room.id)
+            traversal.append(direction)
+            player.travel(direction)
+    return traversal
 
 # print(traversal_path)
 # print(v)
-
+for i in range(1000):
+    print('.',end=' ')
+    traversal = find_path()
+    if len(traversal_path)==0 or len(traversal)<len(traversal_path):
+        traversal_path = traversal[:]
+print('\n')
+# traversal_path = find_path()
 # TRAVERSAL TEST
 visited_rooms = set()
 player.current_room = world.starting_room
