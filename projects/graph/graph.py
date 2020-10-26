@@ -111,25 +111,19 @@ class Graph:
         depth-first order.
         """
         s = Stack()
-        s.push(starting_vertex)
+        s.push([starting_vertex])
         visited = []
-        shortest = []
-        paths = [[starting_vertex]]
         while s.size() > 0:
-            cpath = []
-            cv = s.pop()
-            for p in paths:
-                if cv in p:
-                    cpath = p
+            cpath = s.pop()
+            cv = cpath[-1]
             visited.append(cv)
             for n in self.get_neighbors(cv):
-                if n not in visited and n not in s.stack:
-                    paths.append(cpath + [n])
-                    s.push(n)
+                if n not in visited:
+                    s.push(cpath + [n])
                 if n == destination_vertex:
-                    shortest = cpath + [n]
+                    return cpath + [n]
                     break
-        return shortest
+        return -1
 
     def dfs_recursive(self, starting_vertex, destination_vertex, v=[], p=[], x=False):
         """
