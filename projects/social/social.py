@@ -1,3 +1,6 @@
+import names
+import random
+
 class User:
     def __init__(self, name):
         self.name = name
@@ -45,7 +48,22 @@ class SocialGraph:
         # !!!! IMPLEMENT ME
 
         # Add users
+        for i in range(num_users):
+            self.add_user(names.get_full_name())
 
+        # sigma = num_users // 4
+        sigma = avg_friendships // 2
+        # for i in range(num_users):
+        for u in self.users.keys():
+            # if i in self.users:
+            num_f = int(random.gauss(avg_friendships,sigma))
+            # print(num_f)
+            if num_f > 0:
+                for j in range(num_f):
+                    # print(j)
+                    k = random.randint(1,num_users)
+                    if k in self.users and k!=u and k not in self.friendships[u]:
+                        self.add_friendship(u,k)
         # Create friendships
 
     def get_all_social_paths(self, user_id):
@@ -58,8 +76,23 @@ class SocialGraph:
         The key is the friend's ID and the value is the path.
         """
         visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
+        s = [user_id]
+        paths = [[user_id]]
+        while len(s) > 0:
+            cpath = []
+            cv = s.pop(0)
+            for p in paths:
+                if cv in p:
+                    cpath = p
+            if cv not in visited:
+                visited.update({cv:cpath})
+                if self.friendships.get(cv) is not None:
+                    for friend in self.friendships.get(cv):
+                        if friend not in visited and friend not in s:
+                            paths.append(cpath + [friend])
+                            s.append(friend)
         return visited
+
 
 
 if __name__ == '__main__':
